@@ -1,0 +1,137 @@
+Module Module1
+
+    Sub Main()
+        Dim theTime As Date
+        Dim amountToLowerBy As Integer
+        Console.WriteLine("Welcome To the Virtual Pet Simulator!: (This is an accelerated version of the Game.)")
+        Console.ReadKey()
+        Console.Clear()
+        Console.WriteLine("Please name Your new Pet!")
+        Dim pet As New VirtualPet(Console.ReadLine())
+        theTime = Now
+        Dim PreviousTime As Double = Timer
+
+        Console.Clear()
+        Console.WriteLine("Here is your new Pet!!")
+        Console.WriteLine()
+        DisplayStats(pet, theTime)
+        Dim input As String
+        Do
+            MainMenu(pet)
+            input = GetMenuChoice()
+            'Lower the health here 
+            amountToLowerBy = LowerHealth(pet, PreviousTime)
+            pet.LowerHealth(amountToLowerBy)
+            PreviousTime = Timer
+
+            Select Case input
+                Case 1
+                Case 2
+                Case 3
+                    Console.Clear()
+                    DisplayStats(pet, theTime)
+                    Console.ReadKey()
+                Case 4
+                Case 9
+                    End
+                Case Else
+                    Console.WriteLine("Sorry I dont understand")
+                    Console.ReadKey()
+            End Select
+
+        Loop Until pet.CheckIsAlive = False ' This will Loop the proccess of Displaying the Menu and Directing the user to the Right Subs based upon their input
+        Console.ReadKey()
+    End Sub
+
+    Function LowerHealth(ByVal pet As VirtualPet, ByVal previousTime As Double) As Integer
+        Dim amountToLowerBy As Integer
+        Dim CurrentTime As Double = Timer
+        amountToLowerBy = Int(CurrentTime - previousTime)
+
+        Return amountToLowerBy
+    End Function
+
+
+    Sub DisplayStats(ByVal pet As VirtualPet, ByVal theTime As Date)
+        Console.WriteLine($"{pet.GetName}'s Statistics!")
+        Console.WriteLine()
+
+        Console.WriteLine($"Maximum Health: {pet.GetMaxHealth}")
+        Console.WriteLine($"Current Health: {pet.DisplayHealth}")
+        Console.WriteLine($"{pet.GetName}'s Current Mood ---> {pet.GetMood} ")
+        Console.WriteLine()
+        Console.WriteLine($"{pet.GetName} was created on {theTime}")
+        Console.WriteLine()
+        Console.WriteLine("Press Any Key to return to the menu!")
+    End Sub
+
+    Sub MainMenu(ByVal Pet As VirtualPet)
+        Console.Clear()
+        Console.WriteLine($"Virtual Pet {Pet.GetName}'s Menu")
+        Console.WriteLine()
+        Console.WriteLine("1.   Feed Pet")
+        Console.WriteLine("2.   Play with pet")
+        Console.WriteLine("3.   Display Pet Statistics")
+        Console.WriteLine("4.   Change Pets Name")
+        Console.WriteLine("9.   Exit")
+    End Sub
+
+    Function GetMenuChoice() As String
+        Dim MenuChoice As String
+        MenuChoice = Console.ReadLine()
+        Return MenuChoice
+    End Function
+
+End Module
+
+Public Class VirtualPet
+    Dim maxHealth As Integer = 2000
+    Dim CurrentHealth As Integer = 2000
+    Dim DefaultName As String = "Your Pet"
+    Dim HappyPicture As String = " \(^.^)/"
+    Dim MediumPicture As String = "`o._.o'"
+    Dim SadPicture As String = "\(╥_╥)/"
+    Dim HealthLostPerSecond As Integer = 5
+    Dim isAlive As Boolean = True
+    Dim petName As String
+
+    Public Sub LowerHealth(ByVal Amount As Integer)
+        CurrentHealth = CurrentHealth - (Amount * HealthLostPerSecond)
+    End Sub
+
+    Public Function CheckIsAlive()
+        Return isAlive
+    End Function
+
+    Public Function GetMood()
+        If CurrentHealth < 500 Then
+            Return SadPicture
+        ElseIf CurrentHealth < 1250 Then
+            Return MediumPicture
+        Else
+            Return HappyPicture
+        End If
+    End Function
+
+    Public Function GetName()
+        Return petName
+    End Function
+
+    Function GetMaxHealth()
+        Return maxHealth
+    End Function
+
+    Public Function DisplayHealth()
+        Return CurrentHealth
+    End Function
+
+    Public Sub New(ByVal inputPetName As String)
+        petName = inputPetName
+        Console.WriteLine(petName)
+    End Sub 'This will assign the Chosen Pet name to the pet.
+
+End Class
+
+Public Class Food
+
+End Class
