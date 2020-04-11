@@ -3,8 +3,17 @@ Module Module1
     Sub Main()
         Dim theTime As Date
         Dim theTimeCreated As Double
-        Dim amountToLowerBy As Integer
+        Dim milk As New CupOfMilk(200, "mmmm Tasty", "Cup Of Milk", "\_/")
+        Dim fish As New Fish(150, "Kinda smelly but oh well...", "Fish", " >--) ) ) )*>")
+        Dim RottenFlesh As New RottenFlesh(-300, "How could you do such a thing?!?", "Rotten Flesh", "'('_')'")
+
         Console.WriteLine("Welcome To the Virtual Pet Simulator!: (This is an accelerated version of the Game.)")
+        Console.ReadKey()
+        Console.WriteLine("Your pet will Constantly loose health from the second it is Created.")
+        Console.ReadKey()
+        Console.WriteLine("To counter this you will need to feed your pet or play with it to increase its health!")
+        Console.ReadKey()
+        Console.WriteLine("Good luck - See how long you can last!)")
         Console.ReadKey()
         Console.Clear()
         Console.WriteLine("Please name Your new Pet!")
@@ -19,20 +28,21 @@ Module Module1
             Dim input As String = GetMenuChoice()
             'Lower the health here 
 
-            amountToLowerBy = LowerHealth(pet, PreviousTime)
-            pet.LowerHealth(amountToLowerBy)
+            LowerHealth(pet, PreviousTime)
             PreviousTime = Timer
 
 
             Select Case input
                 Case 1
+                    FeedPet(pet, PreviousTime, milk, fish, RottenFlesh)
                 Case 2
-                    PlayWithPet(pet)
+                    PlayWithPet(pet, PreviousTime)
                 Case 3
                     Console.Clear()
                     DisplayStats(pet, theTime)
                     Console.ReadKey()
                 Case 4
+                    ChangeName(pet)
                 Case 9
                     End
                 Case Else
@@ -45,11 +55,78 @@ Module Module1
         GameOver(theTimeCreated)
         Console.ReadKey()
     End Sub
-    Sub PlayWithPet(ByVal Pet As VirtualPet)
+
+    Sub ChangeName(ByVal pet As VirtualPet)
+        Console.Clear()
+        Console.WriteLine("What do you want to change your pets name to?")
+        Dim newpetname As String = Console.ReadLine()
+        pet.ChangeName(newpetname)
+        Console.Clear()
+        Console.WriteLine($"Your pets name has been changed to {pet.GetName}")
+        Console.WriteLine()
+    End Sub
+
+    Sub FeedPet(ByVal Pet As VirtualPet, ByRef PreviousTime As Double, ByVal milk As CupOfMilk, ByVal fish As Fish, ByVal RottenFlesh As RottenFlesh)
+        Console.Clear()
+        Console.WriteLine($"What would you like to feed {Pet.GetName}?  {milk.GetName} <m> or {fish.GetName} <f> or {RottenFlesh.GetName} <r> ???")
+        Dim input As String = Console.ReadLine()
+
+        If LCase(input) = "f" Then
+
+            Pet.IncreaseHealthFood(fish.GetHealth)
+            Console.WriteLine($"{fish.GetPicture}")
+            Console.ReadKey()
+            Console.WriteLine($"{fish.GetComment}")
+            Console.ReadKey()
+            Console.WriteLine($"{Pet.GetName} ate the {fish.GetName} and gained {fish.GetHealth} health!")
+
+        ElseIf LCase(input) = "m" Then
+
+            Pet.IncreaseHealthFood(milk.GetHealth)
+            Console.WriteLine($"{milk.GetPicture}")
+            Console.ReadKey()
+            Console.WriteLine($"{milk.GetComment}")
+            Console.ReadKey()
+            Console.WriteLine($"{Pet.GetName} Drank the {milk.GetName} and gained {milk.GetHealth} health!")
+
+        ElseIf LCase(input) = "r" Then
+
+            Pet.IncreaseHealthFood(RottenFlesh.GetHealth)
+            Console.WriteLine($"{RottenFlesh.GetPicture}")
+            Console.ReadKey()
+            Console.WriteLine($"{RottenFlesh.GetComment}")
+            Console.ReadKey()
+            Console.WriteLine($"{Pet.GetName} ate the {RottenFlesh.GetName} and Gained {RottenFlesh.GetHealth} health...")
+
+        End If
+
+        LowerHealth(Pet, PreviousTime)
+        PreviousTime = Timer
+        Console.WriteLine($"{Pet.GetName} is now on {Pet.DisplayHealth} Health")
+        Console.ReadKey()
+    End Sub
+
+    Function PlayWithPet(ByVal Pet As VirtualPet, ByRef PreviousTime As Double)
         Console.Clear()
         Console.WriteLine("How long do you want to play for? (In seconds)")
-        Dim timeToPLay As Integer = Console.ReadLine()
-    End Sub
+        Dim timeToPlay As Integer = Console.ReadLine()
+        Console.Clear()
+        Dim tick As Integer = 0
+        Dim HealthGained As Integer
+        Do
+            Console.WriteLine("Playing...")
+            System.Threading.Thread.Sleep(500)
+            Console.Clear()
+            System.Threading.Thread.Sleep(500)
+            tick += 1
+        Loop Until tick = timeToPlay
+        HealthGained = Pet.IncreaseHealth(timeToPlay)
+        Console.WriteLine($"Your Pet gained {HealthGained} Health!")
+        LowerHealth(Pet, PreviousTime)
+        PreviousTime = Timer
+        Console.WriteLine($"{Pet.GetName} is now on {Pet.DisplayHealth} Health")
+        Console.ReadKey()
+    End Function
 
     Sub GameOver(ByVal theTimeCreated As Double)
         Console.Clear()
@@ -67,10 +144,9 @@ Module Module1
         Dim amountToLowerBy As Integer
         Dim CurrentTime As Double = Timer
         amountToLowerBy = Int(CurrentTime - previousTime)
-
+        pet.LowerHealth(amountToLowerBy)
         Return amountToLowerBy
     End Function
-
 
     Sub DisplayStats(ByVal pet As VirtualPet, ByVal theTime As Date)
         Console.WriteLine($"{pet.GetName}'s Statistics!")
@@ -107,14 +183,19 @@ End Module
 
 Public Class VirtualPet
     Dim maxHealth As Integer = 2000
-    Dim CurrentHealth As Integer = 2000
+    Dim CurrentHealth As Integer = 1750
     Dim DefaultName As String = "Your Pet"
     Dim HappyPicture As String = " \(^.^)/"
-    Dim MediumPicture As String = "`o._.o'"
+    Dim MediumPicture As String = "'('_')'"
     Dim SadPicture As String = "\(╥_╥)/"
     Dim HealthLostPerSecond As Integer = 5 ' This changes how fast the pet Will die.
     Dim isAlive As Boolean = True
     Dim petName As String
+
+
+    Public Sub ChangeName(ByVal newName As String)
+        petName = newName
+    End Sub
 
     Public Sub LowerHealth(ByVal Amount As Integer)
         Dim thehealthLost As Integer = Amount * HealthLostPerSecond
@@ -122,6 +203,18 @@ Public Class VirtualPet
         healthLost = thehealthLost
     End Sub
     Dim healthLost As Integer
+
+    Public Function IncreaseHealth(ByVal Amount As Integer)
+        Dim thehealthGained As Integer = Amount * 10
+        CurrentHealth = CurrentHealth + (thehealthGained)
+        Return thehealthGained
+    End Function
+
+    Public Function IncreaseHealthFood(ByVal Amount As Integer)
+        Dim thehealthGained As Integer = Amount
+        CurrentHealth = CurrentHealth + (thehealthGained)
+        Return thehealthGained
+    End Function
 
     Public Function GetHealthLost()
         Return healthLost
@@ -131,18 +224,14 @@ Public Class VirtualPet
         If CurrentHealth < 0 Then
             isAlive = False
         Else
-
         End If
-
-
-
         Return isAlive
     End Function
 
     Public Function GetMood()
-        If CurrentHealth < 500 Then
+        If CurrentHealth < 600 Then
             Return SadPicture
-        ElseIf CurrentHealth < 1250 Then
+        ElseIf CurrentHealth < 1350 Then
             Return MediumPicture
         Else
             Return HappyPicture
@@ -158,7 +247,12 @@ Public Class VirtualPet
     End Function
 
     Public Function DisplayHealth()
-        Return CurrentHealth
+        If CurrentHealth > maxHealth Then
+            Return maxHealth
+        Else
+            Return CurrentHealth
+        End If
+
     End Function
 
     Public Sub New(ByVal inputPetName As String)
@@ -168,6 +262,75 @@ Public Class VirtualPet
 
 End Class
 
-Public Class Food
+Public MustInherit Class Food
+    Protected comment As String
+    Protected health As Integer
+    Protected name As String
+    Protected picture As String
+
+    Public Sub New()
+        comment = "Hello"
+        health = 0
+        name = "Food"
+        picture = " "
+    End Sub
+
+    Public Function GetComment()
+        Return comment
+    End Function
+
+    Public Function GetHealth()
+        Return health
+    End Function
+
+    Public Function GetName()
+        Return name
+    End Function
+
+    Public Function GetPicture()
+        Return picture
+    End Function
+
+End Class
+
+Public Class CupOfMilk
+    Inherits Food
+    Dim defaultHealth As Integer
+
+    Public Sub New(ByVal inputHealth As Integer, ByVal inputComment As String, ByVal inputName As String, ByVal inputPicture As String)
+        MyBase.New()
+        health = inputHealth
+        comment = inputComment
+        name = inputName
+        picture = inputPicture
+    End Sub
+
+End Class
+
+Public Class Fish
+    Inherits Food
+    Dim defaultHealth As Integer
+
+    Public Sub New(ByVal inputHealth As Integer, ByVal inputComment As String, ByVal inputName As String, ByVal inputPicture As String)
+        MyBase.New()
+        health = inputHealth
+        comment = inputComment
+        name = inputName
+        picture = inputPicture
+    End Sub
+
+End Class
+
+Public Class RottenFlesh
+    Inherits Food
+    Dim defaultHealth As Integer
+
+    Public Sub New(ByVal inputHealth As Integer, ByVal inputComment As String, ByVal inputName As String, ByVal inputPicture As String)
+        MyBase.New()
+        health = inputHealth
+        comment = inputComment
+        name = inputName
+        picture = inputPicture
+    End Sub
 
 End Class
