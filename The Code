@@ -2,6 +2,7 @@ Module Module1
 
     Sub Main()
         Dim theTime As Date
+        Dim theTimeCreated As Double
         Dim amountToLowerBy As Integer
         Console.WriteLine("Welcome To the Virtual Pet Simulator!: (This is an accelerated version of the Game.)")
         Console.ReadKey()
@@ -9,24 +10,24 @@ Module Module1
         Console.WriteLine("Please name Your new Pet!")
         Dim pet As New VirtualPet(Console.ReadLine())
         theTime = Now
+        theTimeCreated = Timer
         Dim PreviousTime As Double = Timer
-
         Console.Clear()
-        Console.WriteLine("Here is your new Pet!!")
-        Console.WriteLine()
-        DisplayStats(pet, theTime)
-        Dim input As String
+
         Do
             MainMenu(pet)
-            input = GetMenuChoice()
+            Dim input As String = GetMenuChoice()
             'Lower the health here 
+
             amountToLowerBy = LowerHealth(pet, PreviousTime)
             pet.LowerHealth(amountToLowerBy)
             PreviousTime = Timer
 
+
             Select Case input
                 Case 1
                 Case 2
+                    PlayWithPet(pet)
                 Case 3
                     Console.Clear()
                     DisplayStats(pet, theTime)
@@ -40,7 +41,26 @@ Module Module1
             End Select
 
         Loop Until pet.CheckIsAlive = False ' This will Loop the proccess of Displaying the Menu and Directing the user to the Right Subs based upon their input
+
+        GameOver(theTimeCreated)
         Console.ReadKey()
+    End Sub
+    Sub PlayWithPet(ByVal Pet As VirtualPet)
+        Console.Clear()
+        Console.WriteLine("How long do you want to play for? (In seconds)")
+        Dim timeToPLay As Integer = Console.ReadLine()
+    End Sub
+
+    Sub GameOver(ByVal theTimeCreated As Double)
+        Console.Clear()
+        Console.WriteLine("Your pet seems to have died...")
+        Console.WriteLine("Please Take Better Care next time...")
+
+        Dim TimeSurvived As Double
+        Dim CurrentTimer As Double = Timer
+        TimeSurvived = Int(CurrentTimer - theTimeCreated)
+        TimeSurvived = TimeSurvived / 60
+        Console.WriteLine($"You lasted {TimeSurvived} Minutes.")
     End Sub
 
     Function LowerHealth(ByVal pet As VirtualPet, ByVal previousTime As Double) As Integer
@@ -57,7 +77,7 @@ Module Module1
         Console.WriteLine()
 
         Console.WriteLine($"Maximum Health: {pet.GetMaxHealth}")
-        Console.WriteLine($"Current Health: {pet.DisplayHealth}")
+        Console.WriteLine($"Current Health: {pet.DisplayHealth} (-{pet.GetHealthLost})")
         Console.WriteLine($"{pet.GetName}'s Current Mood ---> {pet.GetMood} ")
         Console.WriteLine()
         Console.WriteLine($"{pet.GetName} was created on {theTime}")
@@ -82,6 +102,7 @@ Module Module1
         Return MenuChoice
     End Function
 
+
 End Module
 
 Public Class VirtualPet
@@ -91,15 +112,30 @@ Public Class VirtualPet
     Dim HappyPicture As String = " \(^.^)/"
     Dim MediumPicture As String = "`o._.o'"
     Dim SadPicture As String = "\(╥_╥)/"
-    Dim HealthLostPerSecond As Integer = 5
+    Dim HealthLostPerSecond As Integer = 5 ' This changes how fast the pet Will die.
     Dim isAlive As Boolean = True
     Dim petName As String
 
     Public Sub LowerHealth(ByVal Amount As Integer)
-        CurrentHealth = CurrentHealth - (Amount * HealthLostPerSecond)
+        Dim thehealthLost As Integer = Amount * HealthLostPerSecond
+        CurrentHealth = CurrentHealth - (thehealthLost)
+        healthLost = thehealthLost
     End Sub
+    Dim healthLost As Integer
+
+    Public Function GetHealthLost()
+        Return healthLost
+    End Function
 
     Public Function CheckIsAlive()
+        If CurrentHealth < 0 Then
+            isAlive = False
+        Else
+
+        End If
+
+
+
         Return isAlive
     End Function
 
