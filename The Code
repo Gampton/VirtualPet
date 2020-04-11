@@ -1,6 +1,8 @@
 Module Module1
 
     Sub Main()
+        Console.CursorVisible = False
+        Randomize()
         Dim theTime As Date
         Dim theTimeCreated As Double
         Dim milk As New CupOfMilk(200, "mmmm Tasty", "Cup Of Milk", "\_/")
@@ -63,7 +65,7 @@ Module Module1
         pet.ChangeName(newpetname)
         Console.Clear()
         Console.WriteLine($"Your pets name has been changed to {pet.GetName}")
-        Console.WriteLine()
+        Console.ReadKey()
     End Sub
 
     Sub FeedPet(ByVal Pet As VirtualPet, ByRef PreviousTime As Double, ByVal milk As CupOfMilk, ByVal fish As Fish, ByVal RottenFlesh As RottenFlesh)
@@ -106,19 +108,31 @@ Module Module1
         Console.ReadKey()
     End Sub
 
-    Function PlayWithPet(ByVal Pet As VirtualPet, ByRef PreviousTime As Double)
+    Sub PlayWithPet(ByVal Pet As VirtualPet, ByRef PreviousTime As Double)
         Console.Clear()
         Console.WriteLine("How long do you want to play for? (In seconds)")
         Dim timeToPlay As Integer = Console.ReadLine()
         Console.Clear()
         Dim tick As Integer = 0
         Dim HealthGained As Integer
+        Dim RandomX As Integer
+        Dim RandomY As Integer
         Do
+            Console.SetCursorPosition(0, 0)
             Console.WriteLine("Playing...")
+
+            RandomX = Int(Rnd() * (Console.WindowWidth - 20) + 20)
+            RandomY = Int(Rnd() * (Console.WindowHeight - 10) + 10)
+
+            Console.SetCursorPosition(RandomX, RandomY)
+            Console.Write(Pet.GetMood)
             System.Threading.Thread.Sleep(500)
-            Console.Clear()
+            Console.SetCursorPosition(RandomX, RandomY)
+            Console.WriteLine("             ")
             System.Threading.Thread.Sleep(500)
             tick += 1
+
+
         Loop Until tick = timeToPlay
         HealthGained = Pet.IncreaseHealth(timeToPlay)
         Console.WriteLine($"Your Pet gained {HealthGained} Health!")
@@ -126,7 +140,7 @@ Module Module1
         PreviousTime = Timer
         Console.WriteLine($"{Pet.GetName} is now on {Pet.DisplayHealth} Health")
         Console.ReadKey()
-    End Function
+    End Sub
 
     Sub GameOver(ByVal theTimeCreated As Double)
         Console.Clear()
@@ -191,7 +205,6 @@ Public Class VirtualPet
     Dim HealthLostPerSecond As Integer = 5 ' This changes how fast the pet Will die.
     Dim isAlive As Boolean = True
     Dim petName As String
-
 
     Public Sub ChangeName(ByVal newName As String)
         petName = newName
